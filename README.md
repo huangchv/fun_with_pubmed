@@ -1,8 +1,9 @@
 # Fun with Pubmed
 If you are a scientist or a researcher, you may have published your research in a peer-reviewed journal. Publishing papers can serve many purposes, one of which may include disseminating your findings to the community so others can build upon it. However, we are only human, and we take pride in our work. We want to be successful.
-So how does one go about evaluating whether their paper is successful?
-Easy, citations. The more times your paper is cited, the more _successful_. 
-But is it possible to predict the number of citations you can get based on your abstract? 
+
+So how does one go about evaluating whether their paper is successful? Easy, citations. 
+The more times your paper is cited, the more _successful_. But is it possible to predict the number of citations you can get based on your abstract? 
+
 Are there certain keywords you can use in your abstract that will immediately:
 - Get you tons of citations? 
 - The respect of your colleagues?
