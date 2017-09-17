@@ -1,4 +1,12 @@
 ---
 layout: default
 ---
-# Boop
+@@@ index
+
+* [Introduction](intro.md)
+* [Methods](methods.md)
+* [Results](results.md)
+
+@@@
+
+
