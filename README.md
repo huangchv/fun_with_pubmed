@@ -15,4 +15,4 @@ Let's find out if we can answer that first question. I don't think I can help yo
 Here, I will present a tongue-in-cheek analysis of citations based on text mining data from PubMed. 
 
 #### Disclaimer: 
-The results and analysis I present here is purely for fun. Take everything I say and all conclusions drawn with a grain of salt. Please don't use these results to steer the research direction of your lab. Pleaes don't apply for funding with a research direction based on these findings and then blame me. Sorry.
+The results and analysis I present here is purely for fun. Take everything I say and all conclusions drawn with a grain of salt. Please don't use these results to steer the research direction of your lab. Please don't apply for funding with a research direction based on these findings and then blame me. Sorry.
