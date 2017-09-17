@@ -9,9 +9,9 @@ Are there certain keywords you can use in your abstract that will immediately:
 - The respect of your colleagues?
 - The attention of the cute post doc in the neighbouring lab
 - The Nobel prize? 
+
 Let's find out if we can answer that first question. I don't think I can help you with the others.
 
-Here, I will present a tongue-in-cheek analysis of citations based on textmining data from PubMed. 
+Here, I will present a tongue-in-cheek analysis of citations based on text mining data from PubMed. 
 
-## Disclaimer: 
-The results and analysis I present here is purely for fun. Take everything I say and all conclusions drawn with a grain of salt. Please don't use these results to steer the research direction of your lab. 
+##### Disclaimer: 
