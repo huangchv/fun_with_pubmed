@@ -1,23 +1,16 @@
 ###### Libraries ###### 
 library(dplyr)
-library(tidyr)
-library(tidytext)
 library(tibble)
-library(readr)
-library(stringr)
-library(SnowballC)
 library(reshape2)
 library(syuzhet)
 library(tm)
 library(RISmed)
 library(lattice)
 library(ggplot2)
-library(reshape2)
 library(caret)
 library(mlr)
-library(mxnet)
 options(scipen=999)
-
+DATE <-format.Date(Sys.Date(),format = "%Y-%m-%d")
 
 ###### Data ########
 
@@ -30,8 +23,18 @@ temp.n <- all.data$n_author
 temp.n[temp.n>authors_upper] <- authors_upper
 
 all.data$n_authors_scaled <- scale(temp.n, center = TRUE, scale = TRUE)
+
+summary(all.data$impact_factor)
+if_upper <- quantile(all.data$impact_factor, 0.99)
+temp.if <- all.data$impact_factor
+temp.if[temp.if>if_upper] <- if_upper
+
+all.data$impact_factor_scaled <- scale(temp.if, center = TRUE, scale = TRUE)
+
+
+
 ########## regression ##########
-omit.cols <- c(1,2,4,5,6)
+omit.cols <- c(1,2,4,5,6,18)
 #train.data <- all.data[,-omit.cols]
 
 # Split data 
@@ -53,33 +56,64 @@ xgboost.lrn <- setHyperPars(
   subsample = .7, 
   max_depth=4, 
   nrounds=300,
-  eval_metric = 'rmse', 
+  eval_metric = 'mae', 
   nthread=4, 
   gamma=1)
 
 
 # Tune nrounds
 rounds.params <- makeParamSet(
-  makeDiscreteParam('nrounds', values = seq(25,650,25))
+  makeDiscreteParam('nrounds', values = seq(10,100,10))
   )
 
 # CV strat
-re.strat <- makeResampleDesc("CV", iters=4)
+# re.strat <- makeResampleDesc("CV", iters=4)
 
 # tuning strat - random fun
 ctrl <- makeTuneControlGrid(resolution=10)
-#ctrl <- makeTuneControlRandom(maxit = 100L)
 
+# Nested cross validation cause there's no such thing as overkill? 
+inner = makeResampleDesc("CV", iters = 4)
 
-# Tune =| 
-mytune <- tuneParams(
-  learner = xgboost.lrn, 
-  task = regression.task, 
-  resampling = re.strat, 
-  measures = rmse, 
+inner.learner <- makeTuneWrapper(
+  xgboost.lrn, 
+  resampling = inner, 
   par.set = rounds.params, 
   control = ctrl, 
-  show.info = T)
+  measures = list(mae, rmse, mse),
+  show.info = TRUE
+)
+
+outer.wrap <- makeResampleDesc("CV", iters = 10)
+
+# Tuning
+tune.someparams <- resample(
+  inner.learner, 
+  regression.task, 
+  resampling = outer.wrap, 
+  extract = getTuneResult, 
+  measures = list(mae, rmse, mse),
+  show.info = TRUE
+)
+
+tuning_results <- getNestedTuneResultsOptPathDf(tune.someparams)
+
+# Find best nrounds
+best_results <- tuning_results %>% 
+  group_by(iter) %>%
+  slice(which.min(mae.test.mean)) %>%
+  as.data.frame
+
+# Determine best nrounds
+best.param <- as.numeric(as.character(best_results[which.min(best_results$mse.test.mean),1]))
+
+# Adjust learner
+xgboost.lrn <- setHyperPars(
+  xgboost.lrn, 
+  nrounds=best.param,
+  eval_metric = 'rmse'
+)
+
 
 # nrounds25? RMSE 19.6
 xgboost.model <- mlr::train(learner = xgboost.lrn, task = regression.task)
@@ -89,7 +123,7 @@ train.pred <- predict(xgboost.model, task = regression.task)
 plot(test.pred$data$truth, test.pred$data$response)
 plot(train.pred$data$truth, train.pred$data$response)
 
-cor(test.pred$data$truth, test.pred$data$response, method='spearman')
+cor(test.pred$data$truth, test.pred$data$response)
 
 
 boop<-getFeatureImportance(xgboost.model)
@@ -99,8 +133,5 @@ feature.iwant$feature <- rownames(feature.iwant)
 feature.iwant <- feature.iwant[order(feature.iwant$V1, decreasing=TRUE),]
 head(feature.iwant, 25)
 
-plot(test.pred$data$truth, test.pred$data$response)
-plot(train.pred$data$truth, train.pred$data$response)
-
-cor(test.pred$data$truth, test.pred$data$response)
-plot(density(train.data$citations))
+out.filename <- paste0(DATE, '_xgb_model_all', '.rda')
+saveRDS(xgboost.model, out.filename)
