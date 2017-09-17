@@ -18,6 +18,7 @@ Are there certain keywords you can use in your abstract that will immediately:
 Let's find out if we can answer that first question. I don't think I can help you with the others.
 
 Here, I will present a tongue-in-cheek analysis of citations based on text mining data from PubMed. 
+[Click here to skip straight to the results](https://huangchv.github.io/fun_with_pubmed#Results)
 
 # Methods
 ## Dataset 
@@ -31,8 +32,17 @@ Journal impact factors and Eigenfactors from 2017 were obtained from Thomas Reut
 The tm R package was used to clean up the title and abstract text, remove stopwords, extract stem words, before converting word frequencies to 'term frequency-inverse document frequency' (TF-IDF). Sparse terms that occured in less than 5% of abstracts or less than 1% of titles were dropped. Title and abstract TF-IDF were extracted separately, and are used separately as features. 
 
 ## Model fitting
-
+boooop
 
 # Results
 ## Summary stats
+In total, 30k abstracts were pulled from PubMed, but 70 were missing abstracts *(of course, why should life ever be so easy)*. We proceeded with the remaining 29,930 abstracts. The extracted feature set consisted of 141 and 313 TF-IDF values from the title, and abstract respectively, the 10 NRC sentiments, impact factor, Eigenfactor, number of authors, and publication year for a total of 468 features. 
+
+### Are there journals that are over-represented?
+We extracted the top 10 recurrent journals and appended journals that we typically aim to publish in. 
+
+![alt text](https://github.com/huangchv/fun_with_pubmed/blob/master/docs/result_images/2017-09-10_popular_journals.png "Figure 1. Popular Journals")
+*Figure 1*. Top 10 recurrent journals in the dataset and popular journals that our lab aims to publish in. Forest plot indicates median number of citations as well as the distribution of citations for studies in the paper. Impact factor of journal is indicated in barplot on the right. 
+
+We find that PloS one is a clear outlier with ~3% of the dataset going into the journal. The distribution of citations for PloS one paper tends to be fairly low. Interestingly, the third most popular journal was the Proceedings of the National Academy of Science (PNAS), which outputs papers with a right skewed distribution of citations. In contrast, fewer papers were published in higher impact journals such as the trifecta - Nature, Science, and Cell - and these tended to also have a right skew, but a higher median number of citations. 
 
