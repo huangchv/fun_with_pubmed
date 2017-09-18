@@ -11,7 +11,7 @@ library(syuzhet)
 library(tokenizers)
 
 #### Load data ####
-j_data_all <- readRDS('2017-09-09_2010-2015_abstracts_with_if.rda')
+j_data_all <- readRDS('data/2017-09-09_2010-2015_abstracts_with_if.rda')
 
 #### Summary stats ####
 j_data <- j_data_all[,-c(1,2)]
