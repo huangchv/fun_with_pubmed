@@ -135,3 +135,6 @@ head(feature.iwant, 25)
 
 out.filename <- paste0(DATE, '_xgb_model_all', '.rda')
 saveRDS(xgboost.model, out.filename)
+
+### 
+xgboost.model <- readRDS('2017-09-13_xgb_model_all.rda')
