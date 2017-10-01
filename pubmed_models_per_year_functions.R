@@ -59,7 +59,7 @@ load.prep.data <- function(seed=1000, target.year=2010, filter = TRUE) {
 # Hyperparameters are mostly set, just nrounds
 # nested cross validation to tune nrounds
 
-model.data <- function(train.data, test.data, error.metric = 'mae') {
+model.data <- function(train.data, test.data, target.year, error.metric = 'mae') {
   
   # Set options based on selection of error.metric 
   
@@ -97,7 +97,9 @@ model.data <- function(train.data, test.data, error.metric = 'mae') {
     nrounds=300,
     eval_metric = 'mae', 
     nthread=4, 
-    gamma=1)
+    gamma=1,
+    alpha=1,
+    colsample_bytree = 0.7)
   
   
   ctrl <- makeTuneControlGrid(resolution=10)

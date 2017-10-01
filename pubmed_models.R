@@ -11,7 +11,7 @@ library(caret)
 library(mlr)
 options(scipen=999)
 DATE <-format.Date(Sys.Date(),format = "%Y-%m-%d")
-
+source("fun_with_pubmed/pubmed_models_per_year_functions.R")
 ###### Data ########
 
 all.data <- readRDS('G://Analyses/pubmed/data/2017-09-09_pubmed_processed_data.rda')
@@ -22,15 +22,15 @@ authors_upper <- quantile(all.data$n_author, 0.99)
 temp.n <- all.data$n_author
 temp.n[temp.n>authors_upper] <- authors_upper
 
-all.data$n_authors_scaled <- scale(temp.n, center = TRUE, scale = TRUE)
+all.data$n_authors_scaled <- scale(temp.n, center = TRUE, scale = TRUE)[,1]
 
 summary(all.data$impact_factor)
 if_upper <- quantile(all.data$impact_factor, 0.99)
 temp.if <- all.data$impact_factor
 temp.if[temp.if>if_upper] <- if_upper
 
-all.data$impact_factor_scaled <- scale(temp.if, center = TRUE, scale = TRUE)
-
+all.data$impact_factor_scaled <- scale(temp.if, center = TRUE, scale = TRUE)[,1]
+all.data <- filter(all.data, citations < 1000)
 
 
 ########## regression ##########
@@ -58,7 +58,11 @@ xgboost.lrn <- setHyperPars(
   nrounds=300,
   eval_metric = 'mae', 
   nthread=4, 
-  gamma=1)
+  gamma=1,
+  alpha=1,
+  colsample_bytree = 0.7)
+
+#xgboost.lrn$par.vals
 
 
 # Tune nrounds
@@ -80,7 +84,7 @@ inner.learner <- makeTuneWrapper(
   resampling = inner, 
   par.set = rounds.params, 
   control = ctrl, 
-  measures = list(mae, rmse, mse),
+  measures = list(rmse, mae, mse),
   show.info = TRUE
 )
 
@@ -92,7 +96,7 @@ tune.someparams <- resample(
   regression.task, 
   resampling = outer.wrap, 
   extract = getTuneResult, 
-  measures = list(mae, rmse, mse),
+  measures = list(rmse, mae, mse),
   show.info = TRUE
 )
 
@@ -101,11 +105,12 @@ tuning_results <- getNestedTuneResultsOptPathDf(tune.someparams)
 # Find best nrounds
 best_results <- tuning_results %>% 
   group_by(iter) %>%
-  slice(which.min(mae.test.mean)) %>%
+  #slice(which.min(mae.test.mean)) %>%
+  slice(which.min(rmse.test.rmse)) %>%
   as.data.frame
 
 # Determine best nrounds
-best.param <- as.numeric(as.character(best_results[which.min(best_results$mse.test.mean),1]))
+best.param <- as.numeric(as.character(best_results[which.min(best_results$rmse.test.rmse),1]))
 
 # Adjust learner
 xgboost.lrn <- setHyperPars(
@@ -124,7 +129,7 @@ plot(test.pred$data$truth, test.pred$data$response)
 plot(train.pred$data$truth, train.pred$data$response)
 
 cor(test.pred$data$truth, test.pred$data$response)
-
+assess.model(test.pred, train.pred)
 
 boop<-getFeatureImportance(xgboost.model)
 feature.iwant <- boop$res
@@ -135,6 +140,8 @@ head(feature.iwant, 25)
 
 out.filename <- paste0(DATE, '_xgb_model_all', '.rda')
 saveRDS(xgboost.model, out.filename)
+image.filename <- paste0(DATE, '_xgb_model_all', '.Rdata')
+save.image(image.filename)
 
 ### 
-xgboost.model <- readRDS('2017-09-13_xgb_model_all.rda')
+#xgboost.model <- readRDS('2017-09-13_xgb_model_all.rda')
