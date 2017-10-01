@@ -14,11 +14,58 @@ library(BoutrosLab.plotting.general)
 options(scipen=999)
 DATE <-format.Date(Sys.Date(),format = "%Y-%m-%d")
 
-
-xgboost.model <- readRDS('2017-09-13_xgb_model_all.rda')
-all.features.year <- readRDS('2017-09-17_all_feature_importance.rda')
+# Load
+# Also load the train and test predictions 
+load("2017-09-30_xgb_model_all.Rdata")
+xgboost.model <- readRDS('2017-09-30_xgb_model_all.rda')
+all.features.year <- readRDS('2017-09-30_all_feature_importance.rda')
 
 target.years <- c(2010:2015)
+##### Plot Regression Results ####################
+test.pred$data$class <- 'test'
+test.pred$data$id <- rownames(test.pred$data)
+train.pred$data$class <- 'train'
+predict.toplot <- data.frame(rbind(test.pred$data, train.pred$data))
+
+predict.toplot$class <- as.factor(predict.toplot$class)
+levels(predict.toplot$class)
+
+create.scatterplot(
+  formula = response ~ truth,
+  data = predict.toplot,
+  height = 4,
+  width = 6,
+  pch = 19,
+  cex = 0.5,
+  alpha = 0.6,
+  filename = generate.filename('main_model', 'predicted','png'),
+  type = c('p','g'),
+  col = c('dodgerblue','darkorange'),
+  xlab.cex = 1.5,
+  xaxis.cex = 1.25,
+  ylab.cex = 1.5,
+  yaxis.cex = 1.25,
+  xlab.label = 'Truth',
+  ylab.label = 'Predicted',
+  style = 'Nature',
+  key = list(
+    text = list(
+      lab = c('Test', 'Train'),
+      cex = 1, 
+      col = 'black'
+    ),
+    points = list(
+      pch = 19,
+      col = c('dodgerblue','darkorange'),
+      cex = 1
+    ),
+    x = 0.04,
+    y = 0.94,
+    padding.text = 2
+  )
+  
+  
+)
 
 #### Feature importance for main model #### 
 
@@ -59,6 +106,7 @@ best.features <- unique(as.vector(unlist(best.features)))
 
 # pull target features from all years into matrix
 features.df <- do.call(rbind, all.features.year)
+features.df$year <- gsub('y', '', substr(rownames(features.df), 1,5))
 best.features.df <- features.df %>% 
   filter(feature %in% best.features) %>%
   complete(feature, year, fill = list(V1 = 0))
@@ -125,10 +173,13 @@ create.barplot(
   style ='Nature',
   layout = c(7,1),
   xat = c(0 , 0.25),
-  xlimits = c(-0.01, 0.52),
+  xlimits = c(-0.02, 0.53),
   abline.h = 5.5,
   abline.lwd = 2, 
-  abline.col = 'darkred'
+  abline.col = 'darkred',
+  x.spacing = 0.2,
+  add.grid = TRUE,
+  grid.lwd = 2
   )
 
 ######### 
