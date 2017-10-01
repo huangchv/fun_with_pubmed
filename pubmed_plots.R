@@ -341,7 +341,7 @@ create.densityplot(
 
 ###### Word cloud of sentiments ##### 
 # Grab first 500 abstracts 
-sentiments_set <- tolower(paste(j_data_all$abstract[1:500], collapse = ' '))
+sentiments_set <- tolower(paste(j_data_all$abstract[1:1000], collapse = ' '))
 
 test <- tokenize_words(sentiments_set)
 test2 <- table(test)
@@ -354,7 +354,15 @@ nrc_dict <- get_sentiments('nrc')
 
 words.toplot <- left_join(words, get_sentiments('nrc'), by='word' ) %>%
   filter(!is.na(sentiment)) %>%
-  filter(sentiment == 'positive' | sentiment == 'negative') %>%
-  acast(word ~ sentiment, value.var = 'count', fill=0) %>%
-  comparison.cloud(max.words = 150)
+  filter(sentiment == 'anticipation' | sentiment == 'anger') %>%
+  acast(word ~ sentiment, value.var = 'count', fill=0) 
 
+colnames(words.toplot) <- c('Anger', 'Anticipation')
+
+png(filename = "anger_anticipation_cloud.png",width = 6, height = 4,units = 'in',res = 300)
+par(mfrow=c(1,2))
+wordcloud(rownames(words.toplot), words.toplot[,1], min.freq =3, scale=c(4, 0.8), random.order = FALSE, random.color = FALSE, fixed.asp = TRUE,  colors= c("darkorange1","darkorange2","darkorange3","darkorange4"))
+text(0.5, 1.06, 'Anger', cex = 2)
+wordcloud(rownames(words.toplot), words.toplot[,2], min.freq =3, scale=c(4, 0.8), random.order = FALSE, random.color = FALSE, colors= c("dodgerblue1","dodgerblue2","dodgerblue3","dodgerblue4"))
+text(0.5, 1.06, 'Anticipation', cex= 2)
+dev.off()

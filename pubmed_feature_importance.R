@@ -27,6 +27,9 @@ test.pred$data$id <- rownames(test.pred$data)
 train.pred$data$class <- 'train'
 predict.toplot <- data.frame(rbind(test.pred$data, train.pred$data))
 
+test.rmse <- round(RMSE(test.pred$data$response , test.pred$data$truth), 2)
+train.rmse <- round(RMSE(train.pred$data$response , train.pred$data$truth), 2)
+
 predict.toplot$class <- as.factor(predict.toplot$class)
 levels(predict.toplot$class)
 
@@ -47,25 +50,26 @@ create.scatterplot(
   yaxis.cex = 1.25,
   xlab.label = 'Truth',
   ylab.label = 'Predicted',
-  style = 'Nature',
+  style = 'Nature', 
   key = list(
     text = list(
-      lab = c('Test', 'Train'),
-      cex = 1, 
+      lab = c(paste0('Test, RMSE: ', test.rmse), paste0('Train, RMSE: ', train.rmse)),
+      cex = 0.75, 
       col = 'black'
     ),
     points = list(
       pch = 19,
       col = c('dodgerblue','darkorange'),
-      cex = 1
+      cex = 0.75,
+      alpha = 0.6
     ),
     x = 0.04,
     y = 0.94,
     padding.text = 2
   )
-  
-  
 )
+
+
 
 #### Feature importance for main model #### 
 
@@ -81,13 +85,18 @@ create.barplot(
   formula = order ~ V1,
   data = features.good,
   plot.horizontal = TRUE,
+  width = 11,
+  height = 5,
+  filename = generate.filename('feature_importance','main_model','png'),
   yaxis.lab = rev(features.good$feature),
   ylab.label = '',
   xlab.label = 'Importance',
-  xlab.cex = 1.7,
-  xaxis.cex = 1.5,
-  yaxis.cex = 1.5,
-  xlimits = c(-0.01,0.21),
+  xlab.cex = 1.5,
+  xaxis.cex = 1.25,
+  yaxis.cex = 1.25,
+  add.grid = TRUE,
+  grid.lwd = 1,
+  xlimits = c(-0.01,0.26),
   col = 'dodgerblue',
   style ='Nature'
   )
