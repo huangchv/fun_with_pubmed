@@ -259,6 +259,56 @@ create.densityplot(
   lwd = 3
   )
 ###### Distribution of citation numbers ######
+
+citations.ecdf <- ecdf(j_data$citations)
+citations.cdf <- data.frame(citations = 0:150, cdf = citations.ecdf(0:150))
+
+create.scatterplot(
+  formula = cdf ~ citations,
+  data = citations.cdf,
+  filename = generate.filename('citations_', 'cdf','png'),
+  width = 6,
+  height = 3,
+  type = c('l','g'),
+  style = 'Nature',
+  xlimits = c(-5, 150),
+  xat = seq(0,200,25),
+  ylimits = c(-0.05, 1.05),
+  xlab.label = 'Citations',
+  ylab.label = 'Cumulative Dist.',
+  xlab.cex = 1.5,
+  ylab.cex = 1.5,
+  xaxis.cex = 1.25,
+  yaxis.cex = 1.25,
+  #abline.v = c(0),
+  #abline.h = 1,
+  abline.col = 'grey75',
+  abline.lwd = 2.5,
+  lwd = 2.5
+  )
+
+create.scatterplot(
+  formula = cdf ~ citations,
+  data = citations.cdf[1:20,],
+  filename = generate.filename('citations_ss', 'cdf','png'),
+  width = 6,
+  height = 3,
+  type = c('s','g'),
+  style = 'Nature',
+  xlimits = c(-0.25, 15),
+  ylimits = c(-0.05, 1.05),
+  xat = 0:15,
+  xgrid.at = seq(0,20,5),
+  ygrid.at = seq(0,1,0.2),
+  xlab.label = 'Citations',
+  ylab.label = 'Cumulative Dist.',
+  xlab.cex = 1.5,
+  ylab.cex = 1.5,
+  xaxis.cex = 1.25,
+  yaxis.cex = 1.25,
+  lwd = 2.5
+)
+
 create.densityplot(
   x = as.data.frame(j_data$citations),
   filename = generate.filename('citations_', 'density','png'),
