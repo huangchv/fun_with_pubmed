@@ -111,7 +111,7 @@ create.multiplot(
   height = 4,
   plot.objects = list(count.barplot, citation.seg, impact.barplot),
   plot.layout = c(3,1),
-  xlab.label = c("% dataset", "Citations", 'Impact Factor'),
+  xlab.label = c("% Dataset", "Citations", 'Impact Factor'),
   xlimits = list(c(0,3.2), c(0,450), NULL),
   x.spacing = c(0.2,0.2),
   xat = list(0:3, TRUE, TRUE), 
